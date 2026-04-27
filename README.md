@@ -84,17 +84,22 @@ Hybrid retrieval over the embedded knowledge base feeds grounded context to the 
 
 ![RAG flow](readme_assets/rag_flow.png)
 
-#### Embedding space
+### Embedding space — visualizations
 
-A semantic similarity network of the 5,120 chunks — clusters correspond to topical neighborhoods (advising vs. policies vs. course catalog).
+The hero image below is the full 5,120-chunk semantic similarity network. Nodes are coloured by source domain; edges connect chunks with cosine similarity > 0.82.
 
-![RAG network](readme_assets/rag_network.png)
+![RAG semantic network](readme_assets/rag_network.png)
 
-#### Domain heatmap
-
-Cross-domain similarity, showing how each scraped source maps onto the embedding space.
-
-![RAG heatmap](readme_assets/rag_heatmap.png)
+<table>
+  <tr>
+    <td width="50%"><img src="readme_assets/rag_network_3d_static.png" width="100%"/><br><sub><b>3D projection</b> — depth-faded, same data rotated. An <b>interactive Plotly 3D version</b> (rotate/zoom/hover) is available on request.</sub></td>
+    <td width="50%"><img src="readme_assets/rag_layer_3.png" width="100%"/><br><sub><b>3-domain overlay</b> — Career Center + Student Services + CSC Advising. Larger nodes = more connected (high-degree chunks). Useful for spotting cross-domain bridges.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="readme_assets/rag_heatmap.png" width="100%"/><br><sub><b>Cross-domain similarity heatmap</b> — average cosine similarity between every pair of source domains. Lets us validate that the embedding space respects topical structure (Student Services ↔ CSC Advising overlap is highest).</sub></td>
+    <td width="50%"><img src="readme_assets/rag_embeddings.png" width="100%"/><br><sub><b>Scatter view</b> — flat 2D projection of the embedding space, useful for inspecting individual clusters.</sub></td>
+  </tr>
+</table>
 
 ---
 
@@ -107,9 +112,23 @@ A **Neo4j directed acyclic graph** modeling the NC State course catalog and degr
 - **4-pass allocation engine** matches a student's transcript against requirements: Required → Elective Groups → Pool Requirements → Free Electives. Prevents double-counting and validates prerequisite chains for planned courses.
 - Exposed via a FastAPI service with endpoints for `/audit`, `/full-audit`, `/missing`, `/requirements`, `/programs`, `/courses`.
 
-![DAG example](readme_assets/dag_example.png)
+### Graph in Neo4j Bloom
 
-#### PDF degree-audit parser
+![CS BS — required courses](readme_assets/DAG_HAS_REQUIRED.png)
+<sub>The Computer Science (BS) program node and its <code>HAS_REQUIRED</code> edges to every required course. Cypher result panel on the right shows the matching paths.</sub>
+
+<table>
+  <tr>
+    <td width="50%"><img src="readme_assets/DAG_HAS_ELECTIVE.png" width="100%"/><br><sub><b>HAS_ELECTIVE relationships</b> — elective groupings for the major, organized by group ID. Each group is a "pick N from these" requirement.</sub></td>
+    <td width="50%"><img src="readme_assets/DAG_Pre_reqs.png" width="100%"/><br><sub><b>Prerequisite paths</b> — recursive Cypher traversal showing every prerequisite chain feeding into <code>CSC 326</code>. The graph naturally encodes AND/OR with edge groups.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="readme_assets/DAG_MAJORS.png" width="100%"/><br><sub><b>Cluster structure</b> — laying out all 1,000+ courses by prerequisite connectivity reveals departmental clusters (CSC, Math, Chemistry) emerging from the topology alone.</sub></td>
+    <td width="50%"><img src="readme_assets/DAG_Dimensions.png" width="100%"/><br><sub><b>Dimensions</b> — the full graph at scale; the dense central region is the highly-connected core curriculum (intro CS / math / writing).</sub></td>
+  </tr>
+</table>
+
+### PDF degree-audit parser
 
 Uploaded transcripts are parsed via `pdfplumber` and normalized into the schema the DAG engine consumes.
 
@@ -155,3 +174,4 @@ CS @ NC State · Graduating Aug 2026
 [bnwroble@ncsu.edu](mailto:bnwroble@ncsu.edu) · [LinkedIn](https://www.linkedin.com/in/brandon-wroblewski/)
 
 If you want to dig into any specific component — the agent loop, the audit engine, the hybrid search, or the deployment — I'm happy to walk through it.
+
