@@ -33,7 +33,7 @@ Combines a **hybrid Retrieval-Augmented Generation (RAG)** pipeline, a **Neo4j-b
 
 ## Architecture
 
-![System Architecture](readme_assets/architecture.png)
+![System Architecture](readme_assets/Highlevel_Architecture.png)
 
 - **Frontend (React + Docker):** PDF upload, major/minor selection, chat UI.
 - **Backend (Node.js + Express):** routes student requests to the DAG and Agent services.
